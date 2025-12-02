@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: ai-codraft-backend
+    env: docker
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: STRIPE_SECRET
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_PRICE_FREE
+        sync: false
+      - key: STRIPE_PRICE_PREMIUM
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        sync: false
+      - key: GCS_BUCKET_NAME
+        sync: false
+    healthCheckPath: /health
+    autoDeploy: true
+
+databases:
+  - name: codraft-dev-db
+    databaseName: codraft-dev-db
+    user: admin
+

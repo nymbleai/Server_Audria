@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16
+    container_name: codraft-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: codraft_db_dev
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d codraft_db_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: codraft-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://admin:admin123@db:5432/codraft_db_dev
+      ENVIRONMENT: development
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+      - ./data/ingestion_files:/app/data/ingestion_files
+
+volumes:
+  pgdata: 
