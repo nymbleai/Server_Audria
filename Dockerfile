@@ -5,7 +5,9 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    COQUI_TOS_AGREED=1
+    COQUI_TOS_AGREED=1 \
+    TORCH_CUDA_ARCH_LIST="" \
+    FORCE_CPU=1
 
 # Install system dependencies for TTS
 RUN apt-get update \
@@ -38,8 +40,12 @@ COPY pyproject.toml poetry.lock* ./
 # Install dependencies to system Python
 RUN poetry install --only=main --no-root && rm -rf $POETRY_CACHE_DIR
 
+# Install PyTorch CPU-only first (prevents TTS from trying to install CUDA/GPU dependencies)
+# This is required because Render doesn't have GPUs and CUDA packages are huge (~700MB+)
+RUN pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu || (echo "❌ PyTorch CPU installation failed" && exit 1)
+
 # Install TTS separately (requires system dependencies)
-# Install with verbose output to catch any errors
+# PyTorch is already installed (CPU version), so TTS won't try to install CUDA dependencies
 RUN pip install --verbose TTS==0.21.3 || (echo "❌ TTS installation failed" && exit 1)
 
 # Verify TTS is installed
