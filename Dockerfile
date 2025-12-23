@@ -61,12 +61,12 @@ RUN mkdir -p /app/data/ingestion_files \
     && chown -R appuser:appuser /app
 USER appuser
 
-# Expose port
+# Expose port (Render uses dynamic PORT, but we expose 8000 as default)
 EXPOSE 8000
 
-# Health check
+# Health check (uses PORT env var or defaults to 8000)
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/health || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
 # Use the startup script that runs migrations then starts the app
 CMD ["/app/start.sh"]

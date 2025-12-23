@@ -31,7 +31,7 @@ sqlalchemy = "^2.0.0"
 
 [tool.poetry.scripts]
 dev = "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
-prod = "uvicorn app.main:app --host 0.0.0.0 --port 8000"
+prod = "python run.py"
 
 [build-system]
 requires = ["poetry-core"]
