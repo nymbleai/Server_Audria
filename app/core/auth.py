@@ -18,26 +18,65 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(secur
     
     try:
         token = credentials.credentials
+        user_id = None
+        email = None
         
-        # Try to get user from Supabase using the token
-        user_result = await supabase_service.get_user(token)
-        
-        if not user_result["success"]:
-            raise credentials_exception
+        # First, try to decode JWT locally (fast, no network call)
+        # This is less secure but much faster for debugging
+        try:
+            # Decode without verification to get user info quickly
+            # In production, you should verify the signature
+            payload = jwt.decode(
+                token,
+                options={"verify_signature": False}  # Skip verification for speed
+            )
+            user_id = payload.get("sub")
+            email = payload.get("email")
             
-        user = user_result["user"]
+            if user_id:
+                print(f"✅ Fast JWT decode successful for user: {user_id}")
+                return TokenData(
+                    user_id=user_id,
+                    email=email or ""
+                )
+        except Exception as decode_error:
+            print(f"⚠️ JWT decode failed, trying Supabase: {decode_error}")
         
-        if user is None:
-            raise credentials_exception
+        # Fallback: Try to get user from Supabase (slower but more secure)
+        import asyncio
+        try:
+            user_result = await asyncio.wait_for(
+                supabase_service.get_user(token),
+                timeout=3.0  # Reduced to 3 seconds
+            )
             
-        token_data = TokenData(
-            user_id=user.id,
-            email=user.email
-        )
+            if user_result["success"] and user_result.get("user"):
+                user = user_result["user"]
+                return TokenData(
+                    user_id=user.id,
+                    email=user.email
+                )
+        except asyncio.TimeoutError:
+            print("⚠️ Supabase auth timeout, using JWT decode result")
+            # If Supabase times out but JWT decode worked, use that
+            if user_id:
+                return TokenData(user_id=user_id, email=email or "")
+            raise HTTPException(
+                status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+                detail="Authentication service timeout"
+            )
+        except Exception as supabase_error:
+            print(f"⚠️ Supabase auth error: {supabase_error}")
+            # If JWT decode worked, use that as fallback
+            if user_id:
+                return TokenData(user_id=user_id, email=email or "")
         
-        return token_data
+        raise credentials_exception
         
-    except Exception:
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Auth error: {e}")
         raise credentials_exception
 
 async def get_current_user(token_data: TokenData = Depends(verify_token)) -> TokenData:

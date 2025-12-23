@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import all models to ensure they are registered with metadata
-from app.models import Base, Conversation, Message, File, FileVersion, Category
+from app.models import Base, Conversation, Message, File, FileVersion, Category, Person, PersonDetails
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
