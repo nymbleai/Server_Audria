@@ -11,6 +11,7 @@ from .subscription_tier import SubscriptionTier
 from .user_subscription import UserSubscription, SubscriptionStatus
 from .usage_log import UsageLog, FeatureType
 from .stripe_webhook import StripeWebhook
+from .person import Person, PersonDetails
 
 __all__ = [
     'Base', 
@@ -25,5 +26,7 @@ __all__ = [
     'SubscriptionStatus',
     'UsageLog',
     'FeatureType',
-    'StripeWebhook'
+    'StripeWebhook',
+    'Person',
+    'PersonDetails'
 ] 

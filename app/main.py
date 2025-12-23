@@ -41,8 +41,16 @@ async def health_check():
         "version": "1.0.0"
     })
 
-# Include authentication router
+# Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
+
+# Include persons router
+from app.routers import persons
+app.include_router(persons.router, prefix="/api/persons", tags=["Persons"])
+
+# Include voices router
+from app.routers import voices
+app.include_router(voices.router, prefix="/api/voices", tags=["Voices"])
 
 if __name__ == "__main__":
     import uvicorn

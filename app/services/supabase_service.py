@@ -132,13 +132,18 @@ class SupabaseService:
         """Get user details from access token"""
         self._check_client()
         try:
-            # Get user from JWT token directly
-            response = self.supabase.auth.get_user(access_token)
+            # Run in thread pool to avoid blocking
+            loop = asyncio.get_event_loop()
+            # Use a function instead of lambda to properly capture access_token
+            def _get_user():
+                return self.supabase.auth.get_user(access_token)
+            response = await loop.run_in_executor(None, _get_user)
             return {
                 "success": True,
                 "user": response.user
             }
         except Exception as e:
+            print(f"Error getting user from Supabase: {e}")
             return {
                 "success": False,
                 "error": str(e)

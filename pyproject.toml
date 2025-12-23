@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.12"
 fastapi = "^0.104.1"
 uvicorn = {extras = ["standard"], version = "^0.24.0"}
 python-multipart = "^0.0.6"
@@ -16,12 +16,19 @@ python-dotenv = "^1.0.0"
 pydantic = {extras = ["email"], version = "^2.5.0"}
 pydantic-settings = "^2.1.0"
 supabase = "^2.3.0"
+numpy = "^1.21.0"
+
+# TTS is optional - requires LLVM and cmake to build
+# Install separately with: pip install TTS==0.21.3
+# TTS = {version = "^0.21.3", optional = true}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.0"
 black = "^23.0.0"
 isort = "^5.12.0"
+alembic = "^1.13.0"
+sqlalchemy = "^2.0.0"
 
 [tool.poetry.scripts]
 dev = "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
