@@ -4,13 +4,20 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    COQUI_TOS_AGREED=1
 
-# Install system dependencies
+# Install system dependencies for TTS
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
         curl \
+        cmake \
+        git \
+        libsndfile1 \
+        ffmpeg \
+        libsox-dev \
+        sox \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
@@ -30,6 +37,13 @@ COPY pyproject.toml poetry.lock* ./
 
 # Install dependencies to system Python
 RUN poetry install --only=main --no-root && rm -rf $POETRY_CACHE_DIR
+
+# Install TTS separately (requires system dependencies)
+# Install with verbose output to catch any errors
+RUN pip install --verbose TTS==0.21.3 || (echo "❌ TTS installation failed" && exit 1)
+
+# Verify TTS is installed
+RUN python -c "from TTS.api import TTS; print('✅ TTS verified successfully')" || (echo "❌ TTS verification failed" && exit 1)
 
 # Verify uvicorn is installed
 RUN which uvicorn || echo "uvicorn not found in PATH" && python -m uvicorn --version

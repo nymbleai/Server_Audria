@@ -6,3 +6,5 @@ python-dotenv==1.0.0
 pydantic[email]==2.5.0
 pydantic-settings==2.1.0
 supabase==2.3.0
+numpy>=1.21.0
+TTS==0.21.3

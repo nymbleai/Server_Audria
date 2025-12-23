@@ -37,10 +37,14 @@ try:
     from TTS.api import TTS
     TTS_AVAILABLE = True
     print("✅ Coqui TTS module loaded successfully")
-except ImportError:
+except ImportError as e:
     TTS_AVAILABLE = False
     print("⚠️  Coqui TTS not available - voice cloning disabled")
-    print("   To enable: pip install TTS (requires Python 3.9-3.11)")
+    print(f"   Import error: {e}")
+    print("   To enable: pip install TTS==0.21.3 (requires Python 3.9-3.11)")
+except Exception as e:
+    TTS_AVAILABLE = False
+    print(f"⚠️  Coqui TTS initialization failed: {e}")
 
 # Alternative: Use system TTS (macOS say command) for basic speech
 import subprocess
@@ -116,13 +120,20 @@ class VoiceProcessor:
             return True
         
         try:
-            print("🔄 Initializing Coqui TTS (this may take a moment on first run)...")
+            print(f"🔄 Initializing Coqui TTS with model: {self.tts_model}")
+            print("   (This may take a moment on first run - model will be downloaded)")
+            
+            # Initialize TTS with the model
+            # Note: First run will download the model (~1.5GB)
             self.tts = TTS(self.tts_model)
             self.tts_initialized = True
             print("✅ Coqui TTS initialized successfully")
             return True
         except Exception as e:
             print(f"❌ Failed to initialize Coqui TTS: {e}")
+            print(f"   Error type: {type(e).__name__}")
+            import traceback
+            print(f"   Traceback: {traceback.format_exc()}")
             self.tts = None
             self.tts_initialized = False
             return False
