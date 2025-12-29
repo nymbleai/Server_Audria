@@ -18,6 +18,9 @@ pydantic-settings = "^2.1.0"
 supabase = "^2.3.0"
 numpy = "^1.21.0"
 
+# OpenAI for chat completions and TTS/STT APIs
+openai = "^1.0.0"
+
 # TTS is optional - requires LLVM and cmake to build
 # Install separately with: pip install TTS==0.21.3
 # TTS = {version = "^0.21.3", optional = true}
