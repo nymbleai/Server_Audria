@@ -55,4 +55,5 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Use the startup script that runs migrations then starts the app
-CMD ["/app/start.sh"]
+# Using shell form so PORT env var is properly expanded
+CMD ["/bin/bash", "/app/start.sh"]
