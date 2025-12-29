@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     voice_upload_folder: str = os.getenv("VOICE_UPLOAD_FOLDER", "./uploads/voices")
     tts_model: str = os.getenv("TTS_MODEL", "tts_models/multilingual/multi-dataset/xtts_v2")
     
+    # OpenAI configuration
+    openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY", "")
+    
     class Config:
         env_file = ".env"
 
