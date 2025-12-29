@@ -28,6 +28,7 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(secur
             # In production, you should verify the signature
             payload = jwt.decode(
                 token,
+                key="",  # Empty key when not verifying signature
                 options={"verify_signature": False}  # Skip verification for speed
             )
             user_id = payload.get("sub")

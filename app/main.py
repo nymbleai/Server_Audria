@@ -52,6 +52,14 @@ app.include_router(persons.router, prefix="/api/persons", tags=["Persons"])
 from app.routers import voices
 app.include_router(voices.router, prefix="/api/voices", tags=["Voices"])
 
+# Include scheduled calls router
+from app.routers import scheduled_calls
+app.include_router(scheduled_calls.router, prefix="/api/scheduled-calls", tags=["Scheduled Calls"])
+
+# Include voice chat router
+from app.routers import voice_chat
+app.include_router(voice_chat.router, prefix="/api/voice-chat", tags=["Voice Chat"])
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
